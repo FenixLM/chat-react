@@ -6,8 +6,9 @@ const MessageComponent = ({ message }) => {
   return (
     <div className={msgClass}>
       {
-        !message.isMe && <img className='w-8 h-8 rounded-full mr-5' src={logoImg} alt="logo-db" />
+        !message.isMe && <img className='relative w-8 h-8 rounded-full mr-5' src={logoImg} alt="logo-db" />
       }
+     
       <div className="relative bg-white p-4 rounded text-n500 whitespace-pre-line">
         {message.text}
       </div>
