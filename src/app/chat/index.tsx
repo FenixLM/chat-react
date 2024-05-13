@@ -17,35 +17,35 @@ import logo from '../../assets/img/sql-image.png';
     const initChat = async () => {
         // const response = await fetch("/api/messages");
         // const data = await response.json();
-        const result = [
-          {
-              "text": "Hola, ¿cómo estás?",
-              "isMe": false
-          },
-          {
-              "text": "¡Hola! Estoy bien, ¿y tú?",
-              "isMe": true
-          },
-          {
-              "text": "Estoy bien también, gracias por preguntar.",
-              "isMe": false
-          },
-          {
-              "text": "¿Qué has estado haciendo últimamente?",
-              "isMe": true
-          },
-          {
-              "text": "He estado trabajando en algunos proyectos personales. ¿Y tú?",
-              "isMe": false
-          },
-          {
-              "text": "Yo también he estado ocupado con el trabajo. Pero está bien encontrar tiempo para los proyectos personales.",
-              "isMe": true
-          }
-      ]
-        setMessages(result);
-        setDisable(true);
-        console.log('messages', messages);
+      //   const result = [
+      //     {
+      //         "text": "Hola, ¿cómo estás?",
+      //         "isMe": false
+      //     },
+      //     {
+      //         "text": "¡Hola! Estoy bien, ¿y tú?",
+      //         "isMe": true
+      //     },
+      //     {
+      //         "text": "Estoy bien también, gracias por preguntar.",
+      //         "isMe": false
+      //     },
+      //     {
+      //         "text": "¿Qué has estado haciendo últimamente?",
+      //         "isMe": true
+      //     },
+      //     {
+      //         "text": "He estado trabajando en algunos proyectos personales. ¿Y tú?",
+      //         "isMe": false
+      //     },
+      //     {
+      //         "text": "Yo también he estado ocupado con el trabajo. Pero está bien encontrar tiempo para los proyectos personales.",
+      //         "isMe": true
+      //     }
+      // ]
+      //   setMessages(result);
+      //   setDisable(true);
+      //   console.log('messages', messages);
         
 
     };
@@ -54,13 +54,50 @@ import logo from '../../assets/img/sql-image.png';
         initChat();
     }, []);
 
+    const fetchMessages = async (message) => {
+      try {
+        const response = await fetch("http://localhost:5000/api/message-response", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Error al enviar el mensaje');
+        }
+        
+        const data = await response.json();
+        console.log('data', data);
+    
+        // Actualiza el estado de los mensajes con la respuesta del servidor
+        return { text: data.text, isMe: false };
+        
+      } catch (error) {
+        console.error('Error al obtener la respuesta del servidor:', error);
+        return { text: 'Error al obtener la respuesta del servidor', isMe: false };
+      }
+    };
+
   const sendMessage = async (message: any) => {
     setShowLoader(true);
     setDisable(true);
 
-    const prevMessages: any = [...messages, { text: message, isMe: true }]
+    const prevMessages = [...messages, { text: message, isMe: true }]
     setMessages(prevMessages);
-    scrollToBottom();
+
+    console.log('message send', messages);
+    
+
+    const response = await fetchMessages(message);
+    const newMessages = [...prevMessages, response];
+    setMessages(newMessages);
+
+
+    
+    setDisable(false);
+    setShowLoader(false);
   }
    
   
@@ -82,8 +119,8 @@ import logo from '../../assets/img/sql-image.png';
           <img className='rounded  w-24' src={logo} alt="logo-consultant" />
 
           <div className='flex flex-col justify-center text-left'>
-            <strong className='' >Caliop</strong>
-            <p className="font-normal">Consultor</p>
+            <strong className='' >CHAT</strong>
+            <p className="font-normal">Inicie conversación</p>
           </div>
         </span>
       </div >
@@ -102,7 +139,7 @@ import logo from '../../assets/img/sql-image.png';
       </div>
       <ChatFooter
         inputRef={inputRef}
-        disabled={false}
+        disabled={disabled}
         sendMessage={sendMessage}
       />
        </>
